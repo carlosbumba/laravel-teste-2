@@ -46,4 +46,29 @@ class PhoneValidationTest extends TestCase
         $response->assertStatus(422)
             ->assertJsonValidationErrors(['number']);
     }
+
+    public function test_country_code_must_be_two_letters(): void
+    {
+        $response = $this->getJson('/api/v1/validate-number?number=14158586273&country_code=USA');
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors('country_code');
+    }
+
+    public function test_country_code_cannot_be_numeric(): void
+    {
+        $response = $this->getJson('/api/v1/validate-number?number=14158586273&country_code=55');
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors('country_code');
+    }
+
+
+    public function test_number_cannot_be_empty(): void
+    {
+        $response = $this->getJson('/api/v1/validate-number?number=');
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors('number');
+    }
 }

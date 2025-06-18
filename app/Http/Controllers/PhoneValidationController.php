@@ -3,32 +3,25 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\NumVerifyResource;
+use App\Services\NumVerifyService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Http;
 
 class PhoneValidationController extends Controller
 {
-    public function validate(Request $request)
+    public function __construct(protected NumVerifyService $service) {}
+
+    public function __invoke(Request $request)
     {
         $request->validate([
-            'number' => 'required|string',
+            'number' => 'required|string'
         ]);
 
-        $response = Http::get(config('services.numverify.endpoint'), [
-            'access_key'   => config('services.numverify.key'),
-            'number'       => $request->input('number'),
-            'country_code' => $request->input('country_code', ''), // opcional
-            'format'       => 1,
-        ]);
+        $data = $this->service->validate($request->number, $request->country_code);
 
-        if ($response->failed() || isset($response['error'])) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Falha ao validar número.',
-                'error'   => $response->json()['error'] ?? null,
-            ], 400);
+        if (isset($data['error'])) {
+            return response()->json($data, 400);
         }
 
-        return new NumVerifyResource($response->json());
+        return new NumVerifyResource($data);
     }
 }

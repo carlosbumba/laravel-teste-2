@@ -77,4 +77,21 @@ class PhoneValidationTest extends TestCase
         $response->assertStatus(422)
             ->assertJsonValidationErrors('number');
     }
+
+
+    public function test_rate_limit_on_validate_number_endpoint()
+    {
+        $this->fakeNumVerifyApiResponse();
+
+        $limit = 10;
+
+        for ($i = 0; $i < $limit; $i++) {
+            $response = $this->getJson(route('api.validate-number', ['number' => '14158586273']));
+            $response->assertStatus(200);
+        }
+
+        $response = $this->getJson(route('api.validate-number', ['number' => '14158586273']));
+        $response->assertStatus(429);
+    }
+
 }

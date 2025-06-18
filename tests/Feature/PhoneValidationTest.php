@@ -8,7 +8,7 @@ use Tests\TestCase;
 
 class PhoneValidationTest extends TestCase
 {
-    public function test_it_validates_a_phone_number()
+    protected function fakeNumVerifyApiResponse(): void
     {
         // Fake response da API externa
         Http::fake([
@@ -25,6 +25,12 @@ class PhoneValidationTest extends TestCase
                 'line_type' => 'mobile',
             ], 200),
         ]);
+    }
+
+
+    public function test_it_validates_a_phone_number()
+    {
+        $this->fakeNumVerifyApiResponse();
 
         // Dispara a requisição
         $response = $this->getJson('/api/v1/validate-number?number=14158586273');

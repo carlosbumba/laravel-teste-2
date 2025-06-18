@@ -23,7 +23,7 @@ class PhoneValidationRequest extends FormRequest
     {
         return [
             'number' => ['required', 'string'],
-            'country_code' => ['nullable', 'string', 'size:2'], // Ex: 'US', 'BR'
+            'country_code' => ['nullable', 'string', 'size:2', 'regex:/^[A-Z]{2}$/i'], // Ex: 'US', 'BR'
         ];
     }
 
